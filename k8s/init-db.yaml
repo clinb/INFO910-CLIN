@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: init-db
+spec:
+  backoffLimit: 20
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: init-db
+          image: distributed-task-api:dev
+          imagePullPolicy: IfNotPresent
+          command: [python, -m, app.db]
+          envFrom:
+            - configMapRef:
+                name: dtm-config
+            - secretRef:
+                name: dtm-db
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 128Mi

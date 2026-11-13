@@ -1,0 +1,15 @@
+CREATE TABLE IF NOT EXISTS tasks (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    n INTEGER NOT NULL CHECK (n BETWEEN 0 AND 10000000),
+    status TEXT NOT NULL DEFAULT 'PENDING'
+        CHECK (status IN ('PENDING', 'RUNNING', 'COMPLETED', 'FAILED')),
+    result BIGINT,
+    error TEXT,
+    worker_id TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    started_at TIMESTAMPTZ,
+    finished_at TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS tasks_pending_id_idx
+    ON tasks (id) WHERE status = 'PENDING';

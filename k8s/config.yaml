@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dtm-config
+data:
+  PGHOST: postgres
+  PGPORT: "5432"
+  PGDATABASE: tasks
+  PGUSER: tasks
+  POSTGRES_DB: tasks
+  POSTGRES_USER: tasks
+  POLL_INTERVAL: "1"

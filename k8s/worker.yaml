@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: worker
+  template:
+    metadata:
+      labels:
+        app: worker
+    spec:
+      terminationGracePeriodSeconds: 60
+      initContainers:
+        - name: wait-schema
+          image: distributed-task-api:dev
+          imagePullPolicy: IfNotPresent
+          command: [python, -c, "from app.db import connect; connect().execute('SELECT id FROM tasks LIMIT 0')"]
+          envFrom:
+            - configMapRef:
+                name: dtm-config
+            - secretRef:
+                name: dtm-db
+      containers:
+        - name: worker
+          image: distributed-task-api:dev
+          imagePullPolicy: IfNotPresent
+          command: [python, -m, app.worker]
+          envFrom:
+            - configMapRef:
+                name: dtm-config
+            - secretRef:
+                name: dtm-db
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: "1"
+              memory: 128Mi
